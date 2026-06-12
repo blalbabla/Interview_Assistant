@@ -1,0 +1,382 @@
+<Window x:Class="InterviewAssistant.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="clr-namespace:InterviewAssistant.ViewModels"
+        Title="Interview Assistant"
+        Height="650" Width="820"
+        MinHeight="420" MinWidth="560"
+        Background="#1E1E2E">
+
+    <Window.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVis"/>
+
+        <Style x:Key="PanelBorder" TargetType="Border">
+            <Setter Property="Background" Value="#2A2A3E"/>
+            <Setter Property="CornerRadius" Value="6"/>
+            <Setter Property="Padding" Value="10"/>
+        </Style>
+        <Style x:Key="PanelTitle" TargetType="TextBlock">
+            <Setter Property="Foreground" Value="#7C7C9C"/>
+            <Setter Property="FontSize" Value="11"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+        </Style>
+        <Style x:Key="ElapsedText" TargetType="TextBlock">
+            <Setter Property="Foreground" Value="#4A9EFF"/>
+            <Setter Property="FontSize" Value="11"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="Margin" Value="8,0,0,0"/>
+        </Style>
+        <Style x:Key="DeviceTag" TargetType="Border">
+            <Setter Property="CornerRadius" Value="3"/>
+            <Setter Property="Padding" Value="5,1"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="Margin" Value="8,0,0,0"/>
+        </Style>
+        <Style x:Key="ContentText" TargetType="TextBox">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Foreground" Value="#CDD6F4"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="FontFamily" Value="Consolas"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="TextWrapping" Value="Wrap"/>
+            <Setter Property="VerticalScrollBarVisibility" Value="Auto"/>
+            <Setter Property="AcceptsReturn" Value="True"/>
+        </Style>
+        <Style x:Key="SettingsLabel" TargetType="TextBlock">
+            <Setter Property="Foreground" Value="#7C7C9C"/>
+            <Setter Property="FontSize" Value="11"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="Margin" Value="0,0,4,0"/>
+        </Style>
+        <Style x:Key="DarkComboBox" TargetType="ComboBox">
+            <Setter Property="Background" Value="#3A3A4E"/>
+            <Setter Property="Foreground" Value="#010101"/>
+            <Setter Property="BorderBrush" Value="#555570"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="Height" Value="24"/>
+            <Setter Property="Padding" Value="4,0"/>
+        </Style>
+        <Style x:Key="DarkTextBox" TargetType="TextBox">
+            <Setter Property="Background" Value="#3A3A4E"/>
+            <Setter Property="Foreground" Value="#CDD6F4"/>
+            <Setter Property="BorderBrush" Value="#555570"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="Height" Value="24"/>
+            <Setter Property="Padding" Value="4,2"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+        </Style>
+        <Style x:Key="RetryButton" TargetType="Button">
+            <Setter Property="Background" Value="#3A3A4E"/>
+            <Setter Property="Foreground" Value="#CDD6F4"/>
+            <Setter Property="BorderBrush" Value="#555570"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Padding" Value="10,2"/>
+            <Setter Property="FontSize" Value="11"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Height" Value="22"/>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#4A4A60"/>
+                </Trigger>
+                <Trigger Property="IsEnabled" Value="False">
+                    <Setter Property="Opacity" Value="0.4"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+        <!-- "..." кнопка рядом с путём модели -->
+        <Style x:Key="BrowseButton" TargetType="Button">
+            <Setter Property="Background" Value="#3A3A4E"/>
+            <Setter Property="Foreground" Value="#CDD6F4"/>
+            <Setter Property="BorderBrush" Value="#555570"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Height" Value="24"/>
+            <Setter Property="Width" Value="32"/>
+            <Setter Property="Padding" Value="0"/>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#4A4A60"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+        <!-- Кнопка-тоггл настроек в статус-баре -->
+        <Style x:Key="SettingsToggle" TargetType="Button">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Foreground" Value="#555570"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="FontSize" Value="11"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Padding" Value="4,0"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Foreground" Value="#A6ADC8"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </Window.Resources>
+
+    <Grid Margin="12">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="40"/>   <!-- Row 0: статус-бар -->
+            <RowDefinition Height="6"/>    <!-- Row 1: отступ -->
+            <RowDefinition Height="Auto"/> <!-- Row 2: настройки (коллапсируемые) -->
+            <RowDefinition Height="110"/>  <!-- Row 3: вопрос -->
+            <RowDefinition Height="6"/>    <!-- Row 4: отступ -->
+            <RowDefinition Height="*"/>    <!-- Row 5: LLM панель -->
+        </Grid.RowDefinitions>
+
+        <!-- ═══ Статус-бар ═══════════════════════════════════════════════════ -->
+        <Border Grid.Row="0" Style="{StaticResource PanelBorder}">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                    <Ellipse Width="10" Height="10" Margin="0,0,6,0">
+                        <Ellipse.Style>
+                            <Style TargetType="Ellipse">
+                                <Setter Property="Fill" Value="#555570"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsRecording}" Value="True">
+                                        <Setter Property="Fill" Value="#F38BA8"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Ellipse.Style>
+                    </Ellipse>
+                    <TextBlock VerticalAlignment="Center" FontSize="12" FontWeight="Bold">
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="Foreground" Value="#555570"/>
+                                <Setter Property="Text" Value="IDLE"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsRecording}" Value="True">
+                                        <Setter Property="Foreground" Value="#F38BA8"/>
+                                        <Setter Property="Text" Value="REC"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
+                </StackPanel>
+
+                <TextBlock Grid.Column="1" Text="{Binding StatusText}"
+                           Foreground="#A6ADC8" FontSize="12"
+                           VerticalAlignment="Center" Margin="12,0"/>
+
+                <StackPanel Grid.Column="2" Orientation="Horizontal">
+                    <Button Content="{Binding SettingsToggleText}"
+                            Command="{Binding ToggleSettingsCommand}"
+                            Style="{StaticResource SettingsToggle}"/>
+                    <TextBlock Text="Ctrl+Space"
+                               Foreground="#555570" FontSize="11"
+                               VerticalAlignment="Center" Margin="10,0,0,0"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- ═══ Настройки (коллапсируемые) ══════════════════════════════════ -->
+        <Border Grid.Row="2" Style="{StaticResource PanelBorder}" Padding="10,8"
+                Margin="0,0,0,6"
+                Visibility="{Binding IsSettingsVisible, Converter={StaticResource BoolToVis}}">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>  <!-- Whisper -->
+                    <RowDefinition Height="6"/>
+                    <RowDefinition Height="Auto"/>  <!-- LLM -->
+                    <RowDefinition Height="6"/>
+                    <RowDefinition Height="Auto"/>  <!-- Системный промпт -->
+                </Grid.RowDefinitions>
+
+                <!-- ─ Строка Whisper ─────────────────────────────────────── -->
+                <Grid Grid.Row="0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="60"/>   <!-- метка -->
+                        <ColumnDefinition Width="*"/>    <!-- путь -->
+                        <ColumnDefinition Width="32"/>   <!-- кнопка ... -->
+                        <ColumnDefinition Width="Auto"/> <!-- метка Язык -->
+                        <ColumnDefinition Width="80"/>   <!-- дропдаун -->
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock Grid.Column="0" Text="Whisper:" Style="{StaticResource SettingsLabel}"/>
+                    <TextBox Grid.Column="1"
+                             Text="{Binding WhisperModelPath, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                             Style="{StaticResource DarkTextBox}"/>
+                    <Button Grid.Column="2"
+                            Content="..."
+                            Command="{Binding BrowseModelPathCommand}"
+                            Style="{StaticResource BrowseButton}"
+                            Margin="4,0,0,0"/>
+                    <TextBlock Grid.Column="3" Text="Язык" Style="{StaticResource SettingsLabel}" Margin="8,0,4,0"/>
+                    <ComboBox Grid.Column="4"
+                              SelectedIndex="{Binding WhisperLanguageIndex, Mode=TwoWay}"
+                              Style="{StaticResource DarkComboBox}">
+                        <ComboBoxItem Content="auto"/>
+                        <ComboBoxItem Content="ru"/>
+                        <ComboBoxItem Content="en"/>
+                        <ComboBoxItem Content="ua"/>
+                    </ComboBox>
+                </Grid>
+
+                <!-- ─ Строка LLM ──────────────────────────────────────────── -->
+                <Grid Grid.Row="2">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="60"/>   <!-- метка -->
+                        <ColumnDefinition Width="100"/>  <!-- провайдер -->
+                        <ColumnDefinition Width="Auto"/> <!-- метка Модель -->
+                        <ColumnDefinition Width="130"/>  <!-- модель -->
+                        <ColumnDefinition Width="Auto"/> <!-- метка URL -->
+                        <ColumnDefinition Width="*"/>    <!-- URL -->
+                        <ColumnDefinition Width="Auto"/> <!-- чекбокс -->
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock Grid.Column="0" Text="LLM:" Style="{StaticResource SettingsLabel}"/>
+                    <ComboBox Grid.Column="1"
+                              SelectedIndex="{Binding SelectedProviderIndex, Mode=TwoWay}"
+                              Style="{StaticResource DarkComboBox}">
+                        <ComboBoxItem Content="Ollama"/>
+                        <ComboBoxItem Content="LM Studio"/>
+                    </ComboBox>
+                    <TextBlock Grid.Column="2" Text="Модель" Style="{StaticResource SettingsLabel}" Margin="8,0,4,0"/>
+                    <TextBox Grid.Column="3"
+                             Text="{Binding LocalLlmModelName, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                             Style="{StaticResource DarkTextBox}"/>
+                    <TextBlock Grid.Column="4" Text="URL" Style="{StaticResource SettingsLabel}" Margin="8,0,4,0"/>
+                    <TextBox Grid.Column="5"
+                             Text="{Binding LlmBaseUrl, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                             Style="{StaticResource DarkTextBox}"/>
+                    <CheckBox Grid.Column="6"
+                              IsChecked="{Binding IsScreenCaptureHidden, Mode=TwoWay}"
+                              VerticalAlignment="Center" Margin="12,0,0,0">
+                        <TextBlock Text="Скрывать от захвата" Foreground="#A6ADC8" FontSize="12"/>
+                    </CheckBox>
+                </Grid>
+
+                <!-- ─ Системный промпт ────────────────────────────────────── -->
+                <Grid Grid.Row="4">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="60"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock Grid.Column="0" Text="Промпт:"
+                               Style="{StaticResource SettingsLabel}"
+                               VerticalAlignment="Top" Margin="0,4,4,0"/>
+                    <TextBox Grid.Column="1"
+                             Text="{Binding LlmSystemPrompt, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                             Style="{StaticResource DarkTextBox}"
+                             Height="52"
+                             AcceptsReturn="True"
+                             TextWrapping="Wrap"
+                             VerticalScrollBarVisibility="Auto"
+                             VerticalContentAlignment="Top"/>
+                </Grid>
+            </Grid>
+        </Border>
+
+        <!-- ═══ Вопрос ═══════════════════════════════════════════════════════ -->
+        <Border Grid.Row="3" Style="{StaticResource PanelBorder}">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>  <!-- ProgressBar -->
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <!-- Заголовок: название + device tag + тайминг -->
+                <Grid Grid.Row="0" Margin="0,0,0,4">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="РАСПОЗНАННЫЙ ВОПРОС" Style="{StaticResource PanelTitle}"/>
+
+                    <!-- CUDA / CPU тег -->
+                    <Border Grid.Column="1">
+                        <Border.Style>
+                            <Style TargetType="Border" BasedOn="{StaticResource DeviceTag}">
+                                <Setter Property="Background" Value="#2E4A2E"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding SttDeviceText}" Value="CPU">
+                                        <Setter Property="Background" Value="#3A3A20"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Border.Style>
+                        <TextBlock Text="{Binding SttDeviceText}" FontSize="10" FontWeight="Bold">
+                            <TextBlock.Style>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="Foreground" Value="#A8E6A8"/>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding SttDeviceText}" Value="CPU">
+                                            <Setter Property="Foreground" Value="#D4D48A"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBlock.Style>
+                        </TextBlock>
+                    </Border>
+
+                    <TextBlock Grid.Column="2" Text="{Binding SttElapsedText}" Style="{StaticResource ElapsedText}"/>
+                </Grid>
+
+                <!-- Индикатор распознавания -->
+                <ProgressBar Grid.Row="1"
+                             IsIndeterminate="True"
+                             Height="2" Margin="0,0,0,4"
+                             Background="Transparent"
+                             Foreground="#4A9EFF"
+                             BorderThickness="0"
+                             Visibility="{Binding IsSttProcessing, Converter={StaticResource BoolToVis}}"/>
+
+                <!-- Редактируемое поле вопроса -->
+                <TextBox Grid.Row="2"
+                         Text="{Binding RecognizedQuestion, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                         Style="{StaticResource ContentText}"
+                         FontSize="14"
+                         IsReadOnly="False"
+                         CaretBrush="#CDD6F4"/>
+            </Grid>
+        </Border>
+
+        <!-- ═══ Локальный LLM ════════════════════════════════════════════════ -->
+        <Border Grid.Row="5" Style="{StaticResource PanelBorder}">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <!-- Заголовок: название + тайминг + Retry -->
+                <Grid Grid.Row="0" Margin="0,0,0,6">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="{Binding LocalLlmPanelTitle}" Style="{StaticResource PanelTitle}"/>
+                    <TextBlock Grid.Column="1" Text="{Binding LocalLlmElapsed}" Style="{StaticResource ElapsedText}"/>
+                    <Button Grid.Column="3"
+                            Content="↺  Повторить"
+                            Command="{Binding RetryLocalLLMCommand}"
+                            Style="{StaticResource RetryButton}"/>
+                </Grid>
+
+                <TextBox Grid.Row="1"
+                         Text="{Binding LocalLLMResponse, Mode=OneWay}"
+                         Style="{StaticResource ContentText}"
+                         IsReadOnly="True"/>
+            </Grid>
+        </Border>
+    </Grid>
+</Window>
