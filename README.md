@@ -43,7 +43,7 @@
 Модели хранятся локально в формате GGML. Путь прописан в коде:
 
 ```
-ViewModels/MainViewModel.cs → const string WhisperModelPath = @"D:\ollama_models\ggml-medium.bin";
+ViewModels/MainViewModel.cs → const string WhisperModelPath = @"D:\ggml-medium.bin";
 ```
 
 Изменить путь можно там же. Скачать модели:
